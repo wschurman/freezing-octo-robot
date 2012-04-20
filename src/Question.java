@@ -5,8 +5,8 @@ public class Question {
 	
 	
 	public Question(int id, String q) {
-		this.qid = id;
-		this.question = q;
+		this.setQid(id);
+		this.setQuestion(q);
 	}
 	
 	public void setQid(int qid) {

@@ -1,6 +1,11 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
 
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
@@ -11,12 +16,12 @@ public class Parser {
 	
 	public static final String question_filename = "train/questions.txt";
 	public static final String answers_filename = "train/answers.txt";
-	public static final String docs_directory = "train/docs/";
+	public static final String docs_directory = "train/docs";
 	
-	public ArrayList<Question> parseQuestions() throws IOException {
+	public HashMap<Integer, Question> parseQuestions() throws IOException {
 		
 		System.out.println("Parsing Questions...");
-		ArrayList<Question> qs = new ArrayList<Question>();
+		HashMap<Integer, Question> qs = new HashMap<Integer, Question>();
 		
 		CleanerProperties props = new CleanerProperties();
 
@@ -42,13 +47,38 @@ public class Parser {
 			numnode.removeChild(descnode);
 			int num = Integer.parseInt(numnode.getText().toString().replace("Number:", "").trim());
 			
-			qs.add(new Question(num, desc));
+			qs.put(num, new Question(num, desc));
 		}
 		
 		return qs;
 	}
 	
-	public void parseDocs() {
+	public HashMap<Integer, DocumentSet> parseDocs() throws FileNotFoundException, IOException {
 		
+		HashMap<Integer, DocumentSet> set = new HashMap<Integer, DocumentSet>();
+		
+		FilenameFilter filter = new FilenameFilter() {
+		    public boolean accept(File dir, String name) {
+		        return !name.startsWith(".");
+		    }
+		};
+		
+		File dir = new File(docs_directory);
+		
+		File[] files = dir.listFiles(filter);
+		
+		for (File f : files) {
+			DocumentSet s = parseFile(f);
+			set.put(s.getQid(), s);
+		}
+		
+		return set;
+	}
+	
+	private DocumentSet parseFile(File file) throws FileNotFoundException, IOException {
+		
+		
+		
+		//DocumentSet s = new DocumentSet();
 	}
 }

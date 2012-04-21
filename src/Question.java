@@ -3,6 +3,9 @@ public class Question {
 	private int qid;
 	private String question;
 	
+	public question_type qtype;
+	public answer_type atype;
+	
 	public enum question_type {
 		STANDARD,
 	}

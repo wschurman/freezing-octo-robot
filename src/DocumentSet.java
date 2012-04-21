@@ -7,9 +7,13 @@ public class DocumentSet {
 	private int qid;
 	private ArrayList<Document> docs;
 	
+	public DocumentSet(ArrayList<Document> docs) {
+		this.setDocs(docs);
+	}
+	
 	public DocumentSet(int qid, ArrayList<Document> docs) {
 		this.setQid(qid);
-		this.docs = docs;
+		this.setDocs(docs);
 	}
 
 	public void setQid(int qid) {
@@ -18,6 +22,14 @@ public class DocumentSet {
 
 	public int getQid() {
 		return qid;
+	}
+
+	public void setDocs(ArrayList<Document> docs) {
+		this.docs = docs;
+	}
+
+	public ArrayList<Document> getDocs() {
+		return docs;
 	}
 	
 }

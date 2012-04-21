@@ -3,6 +3,13 @@ public class Question {
 	private int qid;
 	private String question;
 	
+	public enum question_type {
+		STANDARD,
+	}
+	
+	public enum answer_type {
+		STANDARD,
+	}
 	
 	public Question(int id, String q) {
 		this.setQid(id);

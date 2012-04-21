@@ -8,14 +8,9 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import org.htmlcleaner.CleanerProperties;
-import org.htmlcleaner.ContentNode;
 import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.SimpleXmlSerializer;
 import org.htmlcleaner.TagNode;
-import org.jdom2.JDOMException;
 
 
 public class Parser {
@@ -23,6 +18,11 @@ public class Parser {
 	public static final String question_filename = "train/questions.txt";
 	public static final String answers_filename = "train/answers.txt";
 	public static final String docs_directory = "train/docs";
+	
+	public HashMap<Integer, Question> questions;
+	public HashMap<Integer, DocumentSet> documents_by_qid;
+	
+	public HashMap<String, Document> raw_documents;
 	
 	private CleanerProperties props = new CleanerProperties();
 	
@@ -35,7 +35,29 @@ public class Parser {
 		props.setAllowHtmlInsideAttributes(true);
 	}
 	
-	public HashMap<Integer, Question> parseQuestions() throws IOException {
+	public void parseAll() throws IOException {
+		questions = parseQuestions();
+		documents_by_qid = parseDocs();
+		
+		raw_documents = convertToRawDocuments(documents_by_qid);
+		System.out.println("SIZE: " + raw_documents.size());
+	}
+	
+	private HashMap<String, Document> convertToRawDocuments(HashMap<Integer, DocumentSet> docs_by_qid) {
+		HashMap<String, Document> ret = new HashMap<String, Document>();
+		
+		for (int i : docs_by_qid.keySet()) {
+			DocumentSet curr = docs_by_qid.get(i);
+			
+			for (Document c : curr.getDocs()) {
+				ret.put(c.content.get("docno"), c);
+			}
+		}
+		
+		return ret;
+	}
+
+	private HashMap<Integer, Question> parseQuestions() throws IOException {
 		
 		System.out.println("Parsing Questions...");
 		HashMap<Integer, Question> qs = new HashMap<Integer, Question>();
@@ -63,7 +85,7 @@ public class Parser {
 		return qs;
 	}
 	
-	public HashMap<Integer, DocumentSet> parseDocs() throws FileNotFoundException, IOException, JDOMException {
+	private HashMap<Integer, DocumentSet> parseDocs() throws FileNotFoundException, IOException {
 		
 		System.out.println("Parsing Documents...");
 		HashMap<Integer, DocumentSet> set = new HashMap<Integer, DocumentSet>();
@@ -98,7 +120,7 @@ public class Parser {
 		}
 	}
 	
-	private DocumentSet parseFile(File file) throws JDOMException, IOException {
+	private DocumentSet parseFile(File file) throws IOException {
 		
 		String fname = file.getName();
 		int qid = Integer.parseInt(fname.replaceAll( "[^\\d]", "" ));

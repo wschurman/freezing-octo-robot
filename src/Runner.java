@@ -2,14 +2,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.jdom2.JDOMException;
-
 
 public class Runner {
 	
-	private HashMap<Integer, Question> questions;
-	
-	public static void main(String[] args) throws IOException, JDOMException {
+	public static void main(String[] args) throws IOException {
 		
 		Parser p = new Parser();
 		p.parseAll();

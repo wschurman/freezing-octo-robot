@@ -35,6 +35,7 @@ public class Parser {
 	public HashMap<Integer, DocumentSet> documents_by_qid;
 	
 	public HashMap<String, Document> raw_documents;
+	public HashMap<String, HashMap<String, Integer>> raw_word_counts;
 	
 	private CleanerProperties props = new CleanerProperties();
 	
@@ -54,6 +55,9 @@ public class Parser {
 		tagQuestions();
 		
 		raw_documents = convertToRawDocuments(documents_by_qid);
+		
+		tagDocumentsAndBuildIndices();
+		
 		System.out.println("SIZE: " + raw_documents.size());
 	}
 	
@@ -192,5 +196,37 @@ public class Parser {
 		}
 	
 		return new DocumentSet(qid, documents);
+	}
+	
+	private void tagDocumentsAndBuildIndices() {
+		raw_word_counts = new HashMap<String, HashMap<String, Integer>>();
+		
+		for (String s : raw_documents.keySet()) {
+			Document doc = raw_documents.get(s);
+			
+			if (doc.getText() != null) {
+				String[] content = doc.getText().trim().split(" ");
+				
+				for (String q : content) {
+					incrementCount(doc, q);
+				}
+			}
+		}
+		
+		System.out.println("BaselineDocumentRetriever counts size: "+raw_word_counts.size());
+	}
+	
+	private void incrementCount(Document d, String s) {
+		if (!raw_word_counts.containsKey(s)) {
+			raw_word_counts.put(s, new HashMap<String, Integer>());
+		}
+		
+		HashMap<String, Integer> curr = raw_word_counts.get(s);
+		
+		if (!curr.containsKey(d.getID())) {
+			curr.put(d.getID(), 0);
+		}
+		
+		curr.put(d.getID(), curr.get(d.getID()) + 1);
 	}
 }

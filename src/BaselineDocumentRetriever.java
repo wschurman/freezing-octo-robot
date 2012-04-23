@@ -12,43 +12,9 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 	
 	private HashMap<String, HashMap<String, Integer>> counts;
 	
-	public BaselineDocumentRetriever(HashMap<String, Document> ds) {
+	public BaselineDocumentRetriever(HashMap<String, Document> ds, HashMap<String, HashMap<String, Integer>> counts) {
 		super(ds);
-		buildIndex();
-	}
-	
-	private void buildIndex() {
-		
-		counts = new HashMap<String, HashMap<String, Integer>>();
-		
-		for (String k : this.ds.keySet()) {
-			Document doc = this.ds.get(k);
-			
-			if (doc.getText() != null) {
-				String[] content = doc.getText().trim().split(" ");
-				
-				for (String q : content) {
-					incrementCount(doc, q);
-				}
-			}
-		}
-		
-		System.out.println("BaselineDocumentRetriever counts size: "+counts.size());
-		
-	}
-	
-	private void incrementCount(Document d, String s) {
-		if (!counts.containsKey(s)) {
-			counts.put(s, new HashMap<String, Integer>());
-		}
-		
-		HashMap<String, Integer> curr = counts.get(s);
-		
-		if (!curr.containsKey(d.getID())) {
-			curr.put(d.getID(), 0);
-		}
-		
-		curr.put(d.getID(), curr.get(d.getID()) + 1);
+		this.counts = counts;
 	}
 	
 	@Override
@@ -87,8 +53,8 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 		for (String s : results.keySet()) {
 			
 			reta.add(this.ds.get(s));
-			
-			if (cnt > 4) break;
+			//System.out.println(this.ds.get(s).getText());
+			if (cnt > 40) break;
 			cnt++;
 		}
 		

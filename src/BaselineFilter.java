@@ -15,6 +15,14 @@ public class BaselineFilter extends AbstractFilter {
 
 	private Question q;
 	
+	private StanfordCoreNLP pipeline;
+	
+	public BaselineFilter() {
+		Properties props = new Properties();
+		props.put("annotators", "tokenize, ssplit");
+		pipeline = new StanfordCoreNLP(props);
+	}
+	
 	@Override
 	public ArrayList<Answer> filter(Question q, DocumentSet ds) {
 		
@@ -32,14 +40,10 @@ public class BaselineFilter extends AbstractFilter {
 	private ArrayList<Answer> extractAnswers(Document d) {
 		ArrayList<Answer> as = new ArrayList<Answer>();
 		
-		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit");
-		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		Annotation document = new Annotation(d.getText());
 		pipeline.annotate(document);
 
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-		System.out.println("WHAAAA: " + sentences.size());
 		for(CoreMap sentence: sentences) {
 			as.add(new Answer(sentence.toString()));
 		}

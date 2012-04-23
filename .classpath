@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/Users/williamschurman/programming/dbstudy/Question Answering/joda-time.jar"/>
 	<classpathentry kind="lib" path="/Users/williamschurman/programming/dbstudy/Question Answering/stanford-corenlp-2012-04-09.jar"/>
 	<classpathentry kind="lib" path="/Users/williamschurman/programming/dbstudy/Question Answering/xom.jar"/>
+	<classpathentry kind="lib" path="/Users/williamschurman/programming/dbstudy/Question Answering/stanford-corenlp-2012-04-09-models.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

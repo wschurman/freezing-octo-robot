@@ -13,10 +13,13 @@ public class Runner {
 		for (int i : p.questions.keySet()) {
 			Question q = p.questions.get(i);
 			
-			// (new AbstractQuestionClassifier()).classifyQuestion(q); // writes to q
-			// DocumentSet d = (new AbstractDocumentRetriever()).getDocuments(q);
-			// ArrayList<Answer> as = (new AbstractFilter()).filter(q, d);
-			// ArrayList<Answer> finals = (new AbstractAnswerExtractor()).extractAnswers(q, as);
+			(new BaselineQuestionClassifier()).classifyQuestion(q); // writes to q
+			DocumentSet d = (new BaselineDocumentRetriever(p.raw_documents)).getDocuments(q);
+			ArrayList<Answer> as = (new BaselineFilter()).filter(q, d);
+			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, as);
+			
+			System.out.println("Question: "+q.getQuestion()+"\nAnswer: "+finals.get(0).answer);
+			break;
 		}
 	}
 

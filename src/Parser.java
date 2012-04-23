@@ -8,9 +8,21 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+
 import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
+
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.util.CoreMap;
 
 
 public class Parser {
@@ -39,6 +51,8 @@ public class Parser {
 		questions = parseQuestions();
 		documents_by_qid = parseDocs();
 		
+		tagQuestions();
+		
 		raw_documents = convertToRawDocuments(documents_by_qid);
 		System.out.println("SIZE: " + raw_documents.size());
 	}
@@ -50,7 +64,7 @@ public class Parser {
 			DocumentSet curr = docs_by_qid.get(i);
 			
 			for (Document c : curr.getDocs()) {
-				ret.put(c.content.get("docno"), c);
+				ret.put(c.getID(), c);
 			}
 		}
 		
@@ -83,6 +97,38 @@ public class Parser {
 
 		System.out.println("Done.");
 		return qs;
+	}
+	
+	
+	private void tagQuestions() {
+		
+		Properties props = new Properties();
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+		
+		for (int i : questions.keySet()) {
+			Question q = questions.get(i);
+			
+			Annotation document = new Annotation(q.getQuestion());
+			pipeline.annotate(document);
+
+			List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+			
+			for(CoreMap sentence: sentences) {
+				q.setTaggedQuestion(sentence);
+				
+				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+					q.nes.add(token.get(NamedEntityTagAnnotation.class));
+					q.labels.add(token);
+				}
+				
+				break;
+			}
+
+			q.setGraph(document.get(CorefChainAnnotation.class));
+		}
+		
+		
 	}
 	
 	private HashMap<Integer, DocumentSet> parseDocs() throws FileNotFoundException, IOException {

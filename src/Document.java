@@ -12,4 +12,8 @@ public class Document {
 	public String getText() {
 		return content.get("text");
 	}
+	
+	public String getID() {
+		return content.get("docno");
+	}
 }

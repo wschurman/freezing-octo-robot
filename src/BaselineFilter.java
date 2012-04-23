@@ -25,7 +25,7 @@ public class BaselineFilter extends AbstractFilter {
 		for (Document d : ds.getDocs()) {
 			ret.addAll(extractAnswers(d));
 		}
-		
+		System.out.println("REALLY???: " + ret.size());
 		return ret;
 	}
 	
@@ -39,7 +39,7 @@ public class BaselineFilter extends AbstractFilter {
 		pipeline.annotate(document);
 
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-		
+		System.out.println("WHAAAA: " + sentences.size());
 		for(CoreMap sentence: sentences) {
 			as.add(new Answer(sentence.toString()));
 		}

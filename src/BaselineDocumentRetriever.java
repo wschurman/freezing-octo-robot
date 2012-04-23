@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -66,7 +67,7 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 			}
 		}
 		
-		TreeMap<Integer, ArrayList<String>> ds = new TreeMap<Integer, ArrayList<String>>();
+		TreeMap<Integer, ArrayList<String>> ds = new TreeMap<Integer, ArrayList<String>>(Collections.reverseOrder());
 		for (String s : results.keySet()) {
 			if (!ds.containsKey(results.get(s))) {
 				ds.put(results.get(s), new ArrayList<String>());

@@ -45,7 +45,7 @@ public class BaselineFilter extends AbstractFilter {
 
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		for(CoreMap sentence: sentences) {
-			as.add(new Answer(sentence.toString()));
+			as.add(new Answer(sentence.toString().replaceAll("\n", ""), d.getID()));
 		}
 		
 		return as;

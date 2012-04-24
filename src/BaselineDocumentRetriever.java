@@ -3,6 +3,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -25,8 +26,15 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 		for (CoreLabel token: q.getTaggedQuestion().get(TokensAnnotation.class)) {
 			
 			String word = token.get(TextAnnotation.class);
+			if(!token.get(PartOfSpeechAnnotation.class).contains("NN"))
+				continue;
+			System.out.println("This is important: " + word);
 			
 			HashMap<String, Integer> wc = counts.get(word);
+			
+			if(wc == null)
+				continue;
+			
 			for (String s : wc.keySet()) {
 				int ins = results.containsKey(s) ? results.get(s) + wc.get(s) : wc.get(s);
 				results.put(s, ins);

@@ -31,6 +31,7 @@ public class Runner {
 			k++;
 			
 			ap.printAnswers(q, finals);
+//			break;
 		}
 		
 		pw.flush();

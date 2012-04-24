@@ -7,7 +7,9 @@ import java.util.Properties;
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
+import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -44,6 +46,16 @@ public class Question {
 		labels = new ArrayList<CoreLabel>();
 	}
 	
+	public ArrayList<String> getNouns(){
+		ArrayList<String> important = new ArrayList<String>();
+		for(CoreLabel token : sentence.get(TokensAnnotation.class)) {
+			String word = token.getString(TextAnnotation.class);
+			String pos = token.get(PartOfSpeechAnnotation.class);
+			if(pos.contains("NN"))
+				important.add(word);
+		}
+		return important;
+	}
 	
 	
 	/* Getters and Setters */

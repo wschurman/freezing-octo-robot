@@ -17,22 +17,39 @@ public class BaselineAnswerExtractor extends AbstractAnswerExtractor {
 	
 	@Override
 	public ArrayList<Answer> extractAnswers(Question q, ArrayList<Answer> as) {
-		HashMap<String, Double> questionVector = getVector(q);
-		normalizeVector(questionVector);
-		
+//		HashMap<String, Double> questionVector = getVector(q);
+//		HashMap<String, Double> questionVector = getVector(q.getNouns());
+//		normalizeVector(questionVector);
 		TreeMap<Double, LinkedList<Answer>> bestAnswers = new TreeMap<Double, LinkedList<Answer>>(Collections.reverseOrder());
 		
+		ArrayList<String> important = q.getNouns();
 		for(Answer ans : as){
-			HashMap<String, Double> ansVector = getVector(ans);
-			normalizeVector(ansVector);
-			double sim = computeCosineSimilarity(ansVector, questionVector);
-			if(bestAnswers.containsKey(sim))
-				bestAnswers.get(sim).add(ans);
-			else{
-				bestAnswers.put(sim, new LinkedList<Answer>());
-				bestAnswers.get(sim).add(ans);
+			double count = 0;
+			String toCheck = ans.answer.toLowerCase();
+			for(String s : important){
+				String nouns = s.toLowerCase();
+				if(toCheck.contains(nouns)){
+					count++;
+				}
 			}
+
+			if(!bestAnswers.containsKey(count))
+				bestAnswers.put(count, new LinkedList<Answer>());
+			bestAnswers.get(count).add(ans);
 		}
+		
+		
+//		for(Answer ans : as){
+//			HashMap<String, Double> ansVector = getVector(ans);
+//			normalizeVector(ansVector);
+//			double sim = computeCosineSimilarity(ansVector, questionVector);
+//			if(bestAnswers.containsKey(sim))
+//				bestAnswers.get(sim).add(ans);
+//			else{
+//				bestAnswers.put(sim, new LinkedList<Answer>());
+//				bestAnswers.get(sim).add(ans);
+//			}
+//		}
 		
 		ArrayList<Answer> best = new ArrayList<Answer>();
 		int ansLeft = Math.min(NUM_ANS, as.size());
@@ -67,6 +84,16 @@ public class BaselineAnswerExtractor extends AbstractAnswerExtractor {
 			wordCounts.put(word, wordCounts.get(word) + 1.0);
 		}
 
+		return wordCounts;
+	}
+	
+	private HashMap<String, Double> getVector(ArrayList<String> question){
+		HashMap<String, Double> wordCounts = new HashMap<String, Double>();
+		for(String s : question){
+			if(!wordCounts.containsKey(s))
+				wordCounts.put(s, 0.0);
+			wordCounts.put(s, wordCounts.get(s) + 1.0);
+		}
 		return wordCounts;
 	}
 

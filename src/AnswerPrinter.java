@@ -19,7 +19,7 @@ public class AnswerPrinter {
 	public void printAnswers(Question q, ArrayList<Answer> as) {
 		int n = 0;
 		for (Answer a : as) {
-			pw.println(q.getQid()+" "+a.docid+" "+a.answer);
+			pw.println(q.getQid()+" "+a.docid+" "+a.getAbridgedVersion());
 			n++;
 			if (n >= 5) break;
 		}

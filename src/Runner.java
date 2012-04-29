@@ -26,12 +26,13 @@ public class Runner {
 			ArrayList<Answer> as = (new BaselineFilter()).filter(q, d);
 			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, as);
 			
-			//System.out.println("Question: "+q.getQuestion()+"\nAnswer: "+finals.get(0).answer);
+			if (finals.size() < 1) continue;
+			System.out.println("Question: "+q.getQuestion()+"\nAnswer: "+finals.get(0).answer);
 			
 			k++;
 			
 			ap.printAnswers(q, finals);
-//			break;
+			if (k > 15) break;
 		}
 		
 		pw.flush();

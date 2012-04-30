@@ -37,6 +37,8 @@ public class Parser {
 	public HashMap<String, Document> raw_documents;
 	public HashMap<String, HashMap<String, Integer>> raw_word_counts;
 	
+	public HashMap<String, HashMap<String, Integer>> raw_stem_counts;
+	
 	private CleanerProperties props = new CleanerProperties();
 	
 	public Parser() {
@@ -107,7 +109,7 @@ public class Parser {
 	private void tagQuestions() {
 		
 		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+		props.put("annotators", "tokenize, ssplit, pos");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		
 		for (int i : questions.keySet()) {
@@ -122,7 +124,7 @@ public class Parser {
 				q.setTaggedQuestion(sentence);
 				
 				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
-					q.nes.add(token.get(NamedEntityTagAnnotation.class));
+//					q.nes.add(token.get(NamedEntityTagAnnotation.class));
 					q.labels.add(token);
 				}
 				
@@ -200,15 +202,18 @@ public class Parser {
 	
 	private void tagDocumentsAndBuildIndices() {
 		raw_word_counts = new HashMap<String, HashMap<String, Integer>>();
+		raw_stem_counts = new HashMap<String, HashMap<String, Integer>>();
 		
 		for (String s : raw_documents.keySet()) {
 			Document doc = raw_documents.get(s);
 			
 			if (doc.getText() != null) {
-				String[] content = doc.getText().trim().split(" ");
+				String[] content = doc.getText().toLowerCase().replaceAll("\'", "").replaceAll("[^a-z0-9 ]", " ").replaceAll("( )+", " ").split(" ");
 				
 				for (String q : content) {
-					incrementCount(doc, q);
+					String stemmed = Util.stemmer.stem(q);
+//					String stemmed = Util.stemmer.stripAffixes(q);
+					incrementCount(doc, q, stemmed);
 				}
 			}
 		}
@@ -216,17 +221,29 @@ public class Parser {
 		System.out.println("BaselineDocumentRetriever counts size: "+raw_word_counts.size());
 	}
 	
-	private void incrementCount(Document d, String s) {
-		if (!raw_word_counts.containsKey(s)) {
-			raw_word_counts.put(s, new HashMap<String, Integer>());
+	private void incrementCount(Document d, String real, String stem) {
+		if (!raw_word_counts.containsKey(real)) {
+			raw_word_counts.put(real, new HashMap<String, Integer>());
+		}
+		if(!raw_stem_counts.containsKey(stem)){
+			raw_stem_counts.put(stem, new HashMap<String, Integer>());
 		}
 		
-		HashMap<String, Integer> curr = raw_word_counts.get(s);
+		HashMap<String, Integer> curr = raw_word_counts.get(real);
+		HashMap<String, Integer> stemCurr = raw_stem_counts.get(stem);
+
+		
 		
 		if (!curr.containsKey(d.getID())) {
 			curr.put(d.getID(), 0);
 		}
 		
 		curr.put(d.getID(), curr.get(d.getID()) + 1);
+		
+		if (!stemCurr.containsKey(d.getID())) {
+			stemCurr.put(d.getID(), 0);
+		}
+		
+		stemCurr.put(d.getID(), stemCurr.get(d.getID()) + 1);
 	}
 }

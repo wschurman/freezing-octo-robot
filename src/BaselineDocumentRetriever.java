@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
@@ -10,62 +11,104 @@ import edu.stanford.nlp.ling.CoreLabel;
 
 
 public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
-	
+
 	private HashMap<String, HashMap<String, Integer>> counts;
-	
-	public BaselineDocumentRetriever(HashMap<String, Document> ds, HashMap<String, HashMap<String, Integer>> counts) {
+	private HashMap<String, HashMap<String, Integer>> stem_counts;
+
+	public BaselineDocumentRetriever(HashMap<String, Document> ds, HashMap<String, HashMap<String, Integer>> counts, HashMap<String, HashMap<String, Integer>> s_counts) {
 		super(ds);
 		this.counts = counts;
+		stem_counts = s_counts;
 	}
-	
+
 	@Override
 	public DocumentSet getDocuments(Question q) {
-		
-		HashMap<String, Integer> results = new HashMap<String, Integer>();
-		
+
+		HashMap<String, Integer> word_results = new HashMap<String, Integer>();
+		HashMap<String, Integer> stem_results = new HashMap<String, Integer>();
+		//		System.out.println(q.getQuestion());
 		for (CoreLabel token: q.getTaggedQuestion().get(TokensAnnotation.class)) {
-			
-			String word = token.get(TextAnnotation.class);
-			if(!token.get(PartOfSpeechAnnotation.class).contains("NN"))
+
+			String word = token.get(TextAnnotation.class).toLowerCase();
+			String pos = token.get(PartOfSpeechAnnotation.class);
+			//			System.out.print(word + " - " + token.get(PartOfSpeechAnnotation.class) + "  |  ");
+
+			if(!Util.relevantPOS.contains(pos))
 				continue;
-			System.out.println("This is important: " + word);
-			
+
+			String stemmed = Util.stemmer.stem(word);
+			//			String stemmed = Util.stemmer.stripAffixes(word);
+
+			System.out.println("Checking index for: " + word + " " + pos + " stemmed: " + stemmed);
+
 			HashMap<String, Integer> wc = counts.get(word);
-			
-			if(wc == null)
+			HashMap<String, Integer> sc = stem_counts.get(stemmed);
+
+			if(wc != null){
+				for (String s : wc.keySet()) {
+					int ins = -1;
+					if(pos.contains("NNP") || pos.contains("JJS")){
+						ins = word_results.containsKey(s) ? word_results.get(s) + 20*wc.get(s) : 20*wc.get(s);
+					}
+					else if(pos.contains("NN")){
+						ins = word_results.containsKey(s) ? word_results.get(s) + 5*wc.get(s) : 5*wc.get(s);
+					}
+					else{
+						ins = word_results.containsKey(s) ? word_results.get(s) + wc.get(s) : wc.get(s);
+					}
+//					System.out.println("Word: " + word + " insertion: " + ins);
+					word_results.put(s, ins);
+				}
+			}
+			if(sc == null)
 				continue;
-			
-			for (String s : wc.keySet()) {
-				int ins = results.containsKey(s) ? results.get(s) + wc.get(s) : wc.get(s);
-				results.put(s, ins);
+
+			for (String s : sc.keySet()) {
+				int ins = -1;
+				if(pos.contains("NNP") || pos.contains("JJS")){
+					ins = stem_results.containsKey(s) ? stem_results.get(s) + 20*sc.get(s) : 20*sc.get(s);
+				}
+				else if(pos.contains("NN")){
+					ins = stem_results.containsKey(s) ? stem_results.get(s) + 5*sc.get(s) : 5*sc.get(s);
+				}
+				else{
+					ins = stem_results.containsKey(s) ? stem_results.get(s) + sc.get(s) : sc.get(s);
+				}
+//				System.out.println("Word: " + stemmed + " insertion: " + ins);
+				stem_results.put(s, ins);
 			}
 		}
-		
-		TreeMap<Integer, ArrayList<String>> ds = new TreeMap<Integer, ArrayList<String>>(Collections.reverseOrder());
-		for (String s : results.keySet()) {
-			if (!ds.containsKey(results.get(s))) {
-				ds.put(results.get(s), new ArrayList<String>());
+		System.out.println();
+
+		RankMap<Integer, String> ds = new RankMap<Integer, String>(Collections.reverseOrder());
+
+		//		TreeMap<Integer, ArrayList<String>> ds = new TreeMap<Integer, ArrayList<String>>(Collections.reverseOrder());
+		for (String s : stem_results.keySet()) {
+			if(word_results.containsKey(s)){
+				word_results.put(s, word_results.get(s) + stem_results.get(s));
 			}
-			ds.get(results.get(s)).add(s);
+			else
+				word_results.put(s, stem_results.get(s));
 		}
+		for(String s : word_results.keySet())
+			ds.put(word_results.get(s), s);
 		
-		results.clear();
-		for (int i : ds.keySet()) {
-			for (String s : ds.get(i)) {
-				results.put(s, i);
-			}
-		}
-		
+		word_results.clear();
+		stem_results.clear();
+
+		List<String> best = ds.getOrderedValues(50);
+
+
 		ArrayList<Document> reta = new ArrayList<Document>();
-		int cnt = 0;
-		for (String s : results.keySet()) {
-			
+		int ind = 1;
+		for (String s : best) {
+//			System.out.println("THE BEST: " + ind + ": " + s + " - " + ds.getValue(s));
+			ind++;
 			reta.add(this.ds.get(s));
 			//System.out.println(this.ds.get(s).getText());
-			if (cnt > 40) break;
-			cnt++;
+
 		}
-		
+
 		return new DocumentSet(reta);
 	}
 

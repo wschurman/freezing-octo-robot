@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -30,6 +33,8 @@ public class Question {
 	public question_type qtype;
 	public answer_type atype;
 	
+	private HashMap<String, Double> wikiContext;
+	
 	public static enum question_type {
 		STANDARD,
 	}
@@ -44,17 +49,89 @@ public class Question {
 		
 		nes = new ArrayList<String>();
 		labels = new ArrayList<CoreLabel>();
+		wikiContext = null;
 	}
 	
-	public ArrayList<String> getNouns(){
-		ArrayList<String> important = new ArrayList<String>();
+	public HashMap<String, Double> getNouns(){
+		HashMap<String, Double> important = new HashMap<String, Double>();
 		for(CoreLabel token : sentence.get(TokensAnnotation.class)) {
-			String word = token.getString(TextAnnotation.class);
+			String word = token.getString(TextAnnotation.class).toLowerCase();
 			String pos = token.get(PartOfSpeechAnnotation.class);
-			if(pos.contains("NN"))
-				important.add(word);
+//			System.out.println(word + " \t" + pos);
+			if(pos.contains("NNP")){
+				important.put(word, 4.0);
+			}
+			else if(pos.contains("NN")){
+				important.put(word, 3.0);
+			}
+			else if(pos.contains("JJ") || pos.contains("VBN") || pos.contains("VBG")){
+				System.out.println(pos + " " + word);
+				important.put(word, 1.5);
+			}
+			else if(pos.contains("CD")){
+				important.put(word, 0.5);
+			}
 		}
 		return important;
+	}
+	
+	public HashMap<String, Double> getWikiQuestion(){
+		if(wikiContext == null){
+			LinkedList<String> important = new LinkedList<String>();
+			String prev = "";
+			String current = null;
+			for(CoreLabel token : sentence.get(TokensAnnotation.class)) {
+				String word = token.getString(TextAnnotation.class).toLowerCase();
+				String pos = token.get(PartOfSpeechAnnotation.class);
+				if((prev.contains("JJ") || prev.contains("NN")) && pos.contains("NN")){
+					current += "_" + word.substring(0, 1).toUpperCase()+word.substring(1);
+					prev = pos;
+				}
+				else if(Util.relevantPOS.contains(pos) && !Util.stopwords.contains(word)){
+					if(current != null){
+						String toAdd = current.substring(0, 1).toUpperCase()+current.substring(1);
+						if(prev.contains("NN"))
+							important.addFirst(toAdd);
+						else
+							important.addLast(toAdd);
+					}
+					current = word;
+					prev = pos;
+				}
+				else{
+					if(current != null){
+						String toAdd = current.substring(0, 1).toUpperCase()+current.substring(1);
+						if(prev.contains("NN"))
+							important.addFirst(toAdd);
+						else
+							important.addLast(toAdd);
+					}
+					prev = pos;
+					current = null;
+				}
+			}
+			if(current != null){
+				String toAdd = current.substring(0, 1).toUpperCase()+current.substring(1);
+				if(prev.contains("NN"))
+					important.addFirst(toAdd);
+				else
+					important.addLast(toAdd);
+			}
+			
+			for(String s : important){
+				System.out.println(s);
+			}
+			System.out.println("=============");
+			wikiContext = WikiParser.newWikiSearch(important, question);
+			RankMap<Double, String> best = new RankMap<Double, String>(wikiContext, Collections.reverseOrder());
+			List<String> top = best.getOrderedValues(25);
+			wikiContext.clear();
+			for(String s : top){
+				wikiContext.put(s, best.getValue(s));
+				System.out.println(s + " - " + wikiContext.get(s));
+			}
+		}
+		return wikiContext;
 	}
 	
 	

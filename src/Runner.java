@@ -18,23 +18,27 @@ public class Runner {
 		AnswerPrinter ap = new AnswerPrinter(5, pw);
 		
 		int k = 0;
+		ProgressTracker pt = new ProgressTracker(p.questions.size());
+		Thread t = new Thread(pt);
+		t.start();
 		for (int i : p.questions.keySet()) {
 			Question q = p.questions.get(i);
 			
 			(new BaselineQuestionClassifier()).classifyQuestion(q); // writes to q
-			DocumentSet d = (new BaselineDocumentRetriever(p.raw_documents, p.raw_word_counts)).getDocuments(q);
-			ArrayList<Answer> as = (new BaselineFilter()).filter(q, d);
+			DocumentSet d = (new BaselineDocumentRetriever(p.raw_documents, p.raw_word_counts, p.raw_stem_counts)).getDocuments(q);
+			ArrayList<Answer> as = (new WikiFilter()).filter(q, d);
 			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, as);
 			
 			//System.out.println("Question: "+q.getQuestion()+"\nAnswer: "+finals.get(0).answer);
 			
 			k++;
-			
+			pt.updateCompletion(k);
 			ap.printAnswers(q, finals);
 //			break;
 		}
 		
 		pw.flush();
 		pw.close();
+		
 	}
 }

@@ -20,65 +20,73 @@ public class BaselineAnswerExtractor extends AbstractAnswerExtractor {
 //		HashMap<String, Double> questionVector = getVector(q);
 //		HashMap<String, Double> questionVector = getVector(q.getNouns());
 //		normalizeVector(questionVector);
-		TreeMap<Double, LinkedList<Answer>> bestAnswers = new TreeMap<Double, LinkedList<Answer>>(Collections.reverseOrder());
 		
-		ArrayList<String> important = q.getNouns();
+		HashMap<String, Double> wikiQuestion = q.getWikiQuestion();
+		RankMap<Double, Answer> rank = new RankMap<Double, Answer>(Collections.reverseOrder());
 		for(Answer ans : as){
-			double count = 0;
-			String toCheck = ans.answer.toLowerCase();
-			for(String s : important){
-				String nouns = s.toLowerCase();
-				if(toCheck.contains(nouns)){
-					count++;
-				}
-			}
-
-			if(!bestAnswers.containsKey(count))
-				bestAnswers.put(count, new LinkedList<Answer>());
-			bestAnswers.get(count).add(ans);
+			HashMap<String, Double> ansVector = getVector(ans);
+			double sim = Util.cosineSimilarity(ansVector, wikiQuestion);
+			rank.put(sim, ans);
 		}
+		ArrayList<Answer> toRet = new ArrayList<Answer>(rank.getOrderedValues(NUM_ANS));
+		for(Answer ans : toRet){
+			System.out.println(rank.getValue(ans) + " :ans: " + ans.answer);
+		}
+		return toRet;
 		
 		
+		
+		
+//		TreeMap<Double, LinkedList<Answer>> bestAnswers = new TreeMap<Double, LinkedList<Answer>>(Collections.reverseOrder());
+//		
+//		HashMap<String, Double> important = q.getNouns();
 //		for(Answer ans : as){
-//			HashMap<String, Double> ansVector = getVector(ans);
-//			normalizeVector(ansVector);
-//			double sim = computeCosineSimilarity(ansVector, questionVector);
-//			if(bestAnswers.containsKey(sim))
-//				bestAnswers.get(sim).add(ans);
-//			else{
-//				bestAnswers.put(sim, new LinkedList<Answer>());
-//				bestAnswers.get(sim).add(ans);
+//			double count = 0;
+//			String toCheck = ans.answer.toLowerCase();
+//			
+//			for(String s : important.keySet()){
+//				if(toCheck.contains(s)){
+//					count += important.get(s);
+//				}
 //			}
+////			if(count > 2)
+////				System.out.println(count);
+//			if(!bestAnswers.containsKey(count))
+//				bestAnswers.put(count, new LinkedList<Answer>());
+//			bestAnswers.get(count).add(ans);
 //		}
 		
-		ArrayList<Answer> best = new ArrayList<Answer>();
-		int ansLeft = Math.min(NUM_ANS, as.size());
 		
-		for(Double d : bestAnswers.keySet()){
-			LinkedList<Answer> set = bestAnswers.get(d);
-			if(set.size() < ansLeft){
-				best.addAll(set);
-				ansLeft -= set.size();
-			}
-			else{
-				for(int x = 0; x < ansLeft; x++){
-					best.add(set.get(x));
-				}
-				ansLeft = 0;
-			}
-			if(ansLeft == 0)
-				break;
-		}
+//		ArrayList<Answer> best = new ArrayList<Answer>();
+//		int ansLeft = Math.min(NUM_ANS, as.size());
+//		
+//		for(Double d : bestAnswers.keySet()){
+//			LinkedList<Answer> set = bestAnswers.get(d);
+//			if(set.size() < ansLeft){
+//				best.addAll(set);
+//				ansLeft -= set.size();
+//			}
+//			else{
+//				for(int x = 0; x < ansLeft; x++){
+//					best.add(set.get(x));
+//				}
+//				ansLeft = 0;
+//			}
+//			if(ansLeft == 0)
+//				break;
+//		}
 
-		return best;
+//		return best;
 	}
 
 	private HashMap<String, Double> getVector(Answer ans){
 		HashMap<String, Double> wordCounts = new HashMap<String, Double>();
 
-		String a = ans.answer;
+		String a = ans.answer.toLowerCase().replaceAll("[^a-z0-9 ]", "");
 		String words[] = a.split(" ");
 		for(String word : words){
+			if(Util.stopwords.contains(word))
+				continue;
 			if(!wordCounts.containsKey(word))
 				wordCounts.put(word, 0.0);
 			wordCounts.put(word, wordCounts.get(word) + 1.0);

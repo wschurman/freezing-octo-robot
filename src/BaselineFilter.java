@@ -19,7 +19,7 @@ public class BaselineFilter extends AbstractFilter {
 	
 	public BaselineFilter() {
 		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit");
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
 		pipeline = new StanfordCoreNLP(props);
 	}
 	
@@ -32,6 +32,7 @@ public class BaselineFilter extends AbstractFilter {
 		
 		for (Document d : ds.getDocs()) {
 			ret.addAll(extractAnswers(d));
+			break;
 		}
 		System.out.println("REALLY???: " + ret.size());
 		return ret;
@@ -45,7 +46,20 @@ public class BaselineFilter extends AbstractFilter {
 
 		List<CoreMap> sentences = document.get(SentencesAnnotation.class);
 		for(CoreMap sentence: sentences) {
-			as.add(new Answer(sentence.toString().replaceAll("\n", ""), d.getID()));
+			boolean add = false;
+			
+			for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
+				String ne = token.get(NamedEntityTagAnnotation.class);
+				if (ne.equalsIgnoreCase(q.atype.name())) {
+					//System.out.println(q.atype.name()+" == "+ne);
+					add = true;
+					break;
+				}
+			}
+			if (add) {
+				//System.out.println(sentence.toString().replaceAll("\n", ""));
+				as.add(new Answer(sentence.toString().replaceAll("\n", ""), d.getID()));
+			}
 		}
 		
 		return as;

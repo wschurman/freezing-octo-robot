@@ -8,3 +8,4 @@ train/docs/*
 
 stanford-corenlp-2012-04-09-models.jar
 wiki/*
+guesses.txt

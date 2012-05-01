@@ -20,7 +20,7 @@ public class WikiFilter extends AbstractFilter {
 	private StanfordCoreNLP pipeline;
 	
 	private final int TOP_DOCS = 7;
-	private final int GROUPING = 4;
+	private final int GROUPING = 1;
 	
 	public WikiFilter() {
 		Properties props = new Properties();
@@ -39,7 +39,7 @@ public class WikiFilter extends AbstractFilter {
 			double sim = filterSim(q, d);
 			docs.put(sim, d);
 		}
-		List<Document> bestDocs = docs.getOrderedValues();
+		List<Document> bestDocs = docs.getOrderedValues(15);
 				
 		for (Document d : bestDocs) {
 //			System.out.println("QUESTION: " + q.getQid() + " - " + d.getID() + " - " + docs.getValue(d));

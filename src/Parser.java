@@ -109,7 +109,7 @@ public class Parser {
 	private void tagQuestions() {
 		
 		Properties props = new Properties();
-		props.put("annotators", "tokenize, ssplit, pos");
+		props.put("annotators", "tokenize, ssplit, pos, lemma, ner");
 		StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 		
 		for (int i : questions.keySet()) {
@@ -124,7 +124,7 @@ public class Parser {
 				q.setTaggedQuestion(sentence);
 				
 				for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
-//					q.nes.add(token.get(NamedEntityTagAnnotation.class));
+					q.nes.add(token.get(NamedEntityTagAnnotation.class));
 					q.labels.add(token);
 				}
 				

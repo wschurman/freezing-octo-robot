@@ -42,7 +42,7 @@ public class WikiParser {
 		TagNode[] results = node.getElementsByAttValue("class", "searchresult", true, false);
 		TagNode[] headers = node.getElementsByAttValue("class", "mw-search-result-heading", true, false);
 		
-		int max = Math.min(1, results.length);
+		int max = Math.min(3, results.length);
 		for(int i = 0; i < max; i++){
 			TagNode res = results[i];
 			TagNode header = headers[i];
@@ -203,6 +203,7 @@ public class WikiParser {
 		for(String s : important){
 			String[] split = s.split("_");
 			for(String word : split){
+				word = word.toLowerCase();
 				mappings.put(word, 100.0);
 			}
 		}
@@ -212,7 +213,7 @@ public class WikiParser {
 		String[] broken = question.split(" ");
 		for(String s : broken){
 			if(!Util.stopwords.contains(s))
-				qWords.add(s);
+				qWords.add(s.toLowerCase());
 		}
 		
 		//Takes the nouns and uses the wikisearch to find the three best articles that the search found
@@ -222,6 +223,22 @@ public class WikiParser {
 		//Loop through each article and find the most relevant parts
 		for(String s : bestSites){
 			System.out.println("Going to this page: " + s);
+			
+			String[] header = s.toLowerCase().split("_");
+			for(String head : header){
+				String toAdd = head.replaceAll("[^a-z0-9]", "");
+				System.out.println("Bumping up: " + toAdd);
+				if(!mappings.containsKey(toAdd)){
+					mappings.put(toAdd, 0.0);
+				}
+				int ins = 75;
+				if(qWords.contains(toAdd)){
+					System.out.println("Not that high");
+					ins = 25;
+				}
+				mappings.put(toAdd, mappings.get(toAdd) + ins);
+			}
+			
 			List<String> n = new LinkedList<String>();
 			n.add(s);
 			//Parse the given site

@@ -40,7 +40,7 @@ public class Question {
 	}
 
 	public static enum answer_type {
-		TIME, LOCATION, ORGANIZATION, PERSON, MONEY, PERCENT, DATE, // NER values
+		TIME, LOCATION, ORGANIZATION, PERSON, MONEY, PERCENT, // NER values
 		
 		STANDARD, NUMBER, PLACE, //standard categories
 		ABBREVIATION,

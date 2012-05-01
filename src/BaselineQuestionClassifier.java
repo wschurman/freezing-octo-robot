@@ -7,7 +7,7 @@ import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 
 
 public class BaselineQuestionClassifier extends AbstractQuestionClassifier {
-
+	
 	@Override
 	public void classifyQuestion(Question q) {
 		
@@ -36,7 +36,7 @@ public class BaselineQuestionClassifier extends AbstractQuestionClassifier {
 		} else if (occ.contains("what")) {
 			
 			if (occ.contains("year")) {
-				q.atype = Question.answer_type.DATE;
+				q.atype = Question.answer_type.TIME;
 			} else if (occ.contains("population")) {
 				
 				q.atype = Question.answer_type.NUMBER;
@@ -55,7 +55,7 @@ public class BaselineQuestionClassifier extends AbstractQuestionClassifier {
 			
 		} else if (occ.contains("when")) {
 			
-			q.atype = Question.answer_type.DATE;
+			q.atype = Question.answer_type.TIME;
 			
 		} else if (occ.contains("why")) {
 			

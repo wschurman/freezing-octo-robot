@@ -889,7 +889,7 @@ public class LovinsStemmer {
   public static void main(String[] ops) {
 
     LovinsStemmer ls = new LovinsStemmer();
-    System.out.println("bahamas : " + ls.stem("bahamas"));
+    System.out.println("bahamas : " + ls.stem("lacan"));
   }
     
 }

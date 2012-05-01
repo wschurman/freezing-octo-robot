@@ -21,13 +21,17 @@ public class Runner {
 		ProgressTracker pt = new ProgressTracker(p.questions.size());
 		Thread t = new Thread(pt);
 		t.start();
+		MLQuestionClassifier classify = new MLQuestionClassifier("train_5500.label.txt");
+		WikiFilter wikiFilter = new WikiFilter();
+		BaselineFilter baselineFilter = new BaselineFilter();
 		for (int i : p.questions.keySet()) {
 			Question q = p.questions.get(i);
 			
-			(new BaselineQuestionClassifier()).classifyQuestion(q); // writes to q
+			classify.classifyQuestion(q); // writes to q
 			DocumentSet d = (new BaselineDocumentRetriever(p.raw_documents, p.raw_word_counts, p.raw_stem_counts)).getDocuments(q);
-			ArrayList<Answer> as = (new WikiFilter()).filter(q, d);
-			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, as);
+			ArrayList<Answer> as = wikiFilter.filter(q, d);
+			ArrayList<Answer> nerFilter = baselineFilter.filter(as, q);
+			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, nerFilter);
 			
 			if (finals.size() < 1) continue;
 			System.out.println("Question: "+q.getQuestion()+"\nAnswer: "+finals.get(0).answer);

@@ -2,7 +2,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TreeMap;
 
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
@@ -26,18 +25,15 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 
 		HashMap<String, Integer> word_results = new HashMap<String, Integer>();
 		HashMap<String, Integer> stem_results = new HashMap<String, Integer>();
-		//		System.out.println(q.getQuestion());
 		for (CoreLabel token: q.getTaggedQuestion().get(TokensAnnotation.class)) {
 
 			String word = token.get(TextAnnotation.class).toLowerCase();
 			String pos = token.get(PartOfSpeechAnnotation.class);
-			//			System.out.print(word + " - " + token.get(PartOfSpeechAnnotation.class) + "  |  ");
 
 			if(!Util.relevantPOS.contains(pos))
 				continue;
 
 			String stemmed = Util.stemmer.stem(word);
-			//			String stemmed = Util.stemmer.stripAffixes(word);
 
 			System.out.println("Checking index for: " + word + " " + pos + " stemmed: " + stemmed);
 
@@ -56,7 +52,6 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 					else{
 						ins = word_results.containsKey(s) ? word_results.get(s) + wc.get(s) : wc.get(s);
 					}
-//					System.out.println("Word: " + word + " insertion: " + ins);
 					word_results.put(s, ins);
 				}
 			}
@@ -74,7 +69,6 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 				else{
 					ins = stem_results.containsKey(s) ? stem_results.get(s) + sc.get(s) : sc.get(s);
 				}
-//				System.out.println("Word: " + stemmed + " insertion: " + ins);
 				stem_results.put(s, ins);
 			}
 		}
@@ -82,7 +76,6 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 
 		RankMap<Integer, String> ds = new RankMap<Integer, String>(Collections.reverseOrder());
 
-		//		TreeMap<Integer, ArrayList<String>> ds = new TreeMap<Integer, ArrayList<String>>(Collections.reverseOrder());
 		for (String s : stem_results.keySet()) {
 			if(word_results.containsKey(s)){
 				word_results.put(s, word_results.get(s) + stem_results.get(s));
@@ -102,11 +95,8 @@ public class BaselineDocumentRetriever extends AbstractDocumentRetriever {
 		ArrayList<Document> reta = new ArrayList<Document>();
 		int ind = 1;
 		for (String s : best) {
-//			System.out.println("THE BEST: " + ind + ": " + s + " - " + ds.getValue(s));
 			ind++;
 			reta.add(this.ds.get(s));
-			//System.out.println(this.ds.get(s).getText());
-
 		}
 
 		return new DocumentSet(reta);

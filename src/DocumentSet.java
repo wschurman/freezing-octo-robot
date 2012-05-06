@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 
 
-
+/*
+ * A set of documents.
+ */
 public class DocumentSet {
 	
 	private int qid;

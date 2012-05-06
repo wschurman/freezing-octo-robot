@@ -44,7 +44,6 @@ public class TrainedQuestionClass {
 				return t.getVector();
 			}
 		}
-//		return new HashMap<String, Double>();
 		return null;
 	}
 	

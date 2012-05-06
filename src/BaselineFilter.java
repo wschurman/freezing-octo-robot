@@ -34,7 +34,6 @@ public class BaselineFilter extends AbstractFilter {
 			ret.addAll(extractAnswers(d));
 			break;
 		}
-		System.out.println("REALLY???: " + ret.size());
 		return ret;
 	}
 	
@@ -52,7 +51,6 @@ public class BaselineFilter extends AbstractFilter {
 				if(ne.equals("DATE"))
 					ne = "TIME";
 				if (ne.equalsIgnoreCase(q.atype.name())) {
-					//System.out.println(q.atype.name()+" == "+ne);
 					toRet.add(a);
 					break;
 				}
@@ -76,13 +74,11 @@ public class BaselineFilter extends AbstractFilter {
 			for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
 				String ne = token.get(NamedEntityTagAnnotation.class);
 				if (ne.equalsIgnoreCase(q.atype.name())) {
-					//System.out.println(q.atype.name()+" == "+ne);
 					add = true;
 					break;
 				}
 			}
 			if (add) {
-				//System.out.println(sentence.toString().replaceAll("\n", ""));
 				as.add(new Answer(sentence.toString().replaceAll("\n", ""), d.getID()));
 			}
 		}

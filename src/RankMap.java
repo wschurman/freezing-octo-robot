@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-
+/*
+ * Class written to enable Map sorted by value.
+ */
 public class RankMap<V extends Number, O> {
 	
 	TreeMap<V, LinkedList<O>> map;

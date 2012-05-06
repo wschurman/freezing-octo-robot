@@ -8,6 +8,9 @@ public class Answer {
 		docid = d;
 	}
 	
+	/*
+	 * Trim answer to 10 words (close to 50 bytes)
+	 */
 	public String getAbridgedVersion() {
 		String[] sp = answer.split(" ");
 		

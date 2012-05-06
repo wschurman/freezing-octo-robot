@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class Runner {
@@ -10,7 +9,6 @@ public class Runner {
 	private static final String fname = "guesses.txt";
 	
 	public static void main(String[] args) throws IOException {
-//		System.out.println("balls");
 		Parser p = new Parser();
 		p.parseAll();
 		
@@ -27,10 +25,15 @@ public class Runner {
 		for (int i : p.questions.keySet()) {
 			Question q = p.questions.get(i);
 			
+			System.out.println("******CLASSIFYING QUESTION********");
 			classify.classifyQuestion(q); // writes to q
+			System.out.println("******RETRIEVING DOCUMENTS********");
 			DocumentSet d = (new BaselineDocumentRetriever(p.raw_documents, p.raw_word_counts, p.raw_stem_counts)).getDocuments(q);
+			System.out.println("******WIKI FILTER********");
 			ArrayList<Answer> as = wikiFilter.filter(q, d);
+			System.out.println("******NER FILTER********");
 			ArrayList<Answer> nerFilter = baselineFilter.filter(as, q);
+			System.out.println("******EXTRACTING ANSWERS********");
 			ArrayList<Answer> finals = (new BaselineAnswerExtractor()).extractAnswers(q, nerFilter);
 			
 			if (finals.size() < 1) continue;
@@ -39,11 +42,10 @@ public class Runner {
 			k++;
 			pt.updateCompletion(k);
 			ap.printAnswers(q, finals);
-			if (k > 15) break;
+			if (k > 2) break;
 		}
 		
 		pw.flush();
 		pw.close();
-		
 	}
 }

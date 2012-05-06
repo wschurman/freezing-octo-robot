@@ -16,10 +16,10 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
@@ -191,7 +191,6 @@ public class Parser {
 			TagNode[] childs = e.getAllElements(false);
 			for (TagNode f : childs) {
 				data.put(f.getName(), f.getText().toString().trim());
-				//System.out.println(f.getName() + ", " + f.getText().toString().trim());
 			}
 			
 			documents.add(new Document(data));
@@ -212,7 +211,6 @@ public class Parser {
 				
 				for (String q : content) {
 					String stemmed = Util.stemmer.stem(q);
-//					String stemmed = Util.stemmer.stripAffixes(q);
 					incrementCount(doc, q, stemmed);
 				}
 			}

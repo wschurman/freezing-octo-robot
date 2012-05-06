@@ -1,7 +1,9 @@
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-
+/*
+ * Class for printing answers to a file in the uploadable format.
+ */
 public class AnswerPrinter {
 	
 	private int num = 5;
@@ -21,7 +23,7 @@ public class AnswerPrinter {
 		for (Answer a : as) {
 			pw.println(q.getQid()+" "+a.docid+" "+a.getAbridgedVersion());
 			n++;
-			if (n >= 5) break;
+			if (n >= num) break;
 		}
 	}
 	

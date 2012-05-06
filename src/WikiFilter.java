@@ -4,10 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
-import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
@@ -42,11 +39,9 @@ public class WikiFilter extends AbstractFilter {
 		List<Document> bestDocs = docs.getOrderedValues(15);
 				
 		for (Document d : bestDocs) {
-//			System.out.println("QUESTION: " + q.getQid() + " - " + d.getID() + " - " + docs.getValue(d));
 			ret.addAll(extractAnswers(d));
 		}
 		
-//		System.out.println("REALLY???: " + ret.size());
 		return ret;
 	}
 	
@@ -85,7 +80,6 @@ public class WikiFilter extends AbstractFilter {
 		for(CoreMap sentence: sentences) {
 			if(count == GROUPING){
 				as.add(new Answer(nextAnswer, d.getID()));
-//				System.out.println(nextAnswer);
 				nextAnswer = "";
 				count = 0;
 			}

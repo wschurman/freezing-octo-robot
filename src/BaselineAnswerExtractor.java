@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.SortedSet;
-import java.util.TreeMap;
 
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
@@ -17,9 +14,6 @@ public class BaselineAnswerExtractor extends AbstractAnswerExtractor {
 	
 	@Override
 	public ArrayList<Answer> extractAnswers(Question q, ArrayList<Answer> as) {
-//		HashMap<String, Double> questionVector = getVector(q);
-//		HashMap<String, Double> questionVector = getVector(q.getNouns());
-//		normalizeVector(questionVector);
 		
 		HashMap<String, Double> wikiQuestion = q.getWikiQuestion();
 		RankMap<Double, Answer> rank = new RankMap<Double, Answer>(Collections.reverseOrder());
@@ -33,50 +27,6 @@ public class BaselineAnswerExtractor extends AbstractAnswerExtractor {
 			System.out.println(rank.getValue(ans) + " :ans: " + ans.answer);
 		}
 		return toRet;
-		
-		
-		
-		
-//		TreeMap<Double, LinkedList<Answer>> bestAnswers = new TreeMap<Double, LinkedList<Answer>>(Collections.reverseOrder());
-//		
-//		HashMap<String, Double> important = q.getNouns();
-//		for(Answer ans : as){
-//			double count = 0;
-//			String toCheck = ans.answer.toLowerCase();
-//			
-//			for(String s : important.keySet()){
-//				if(toCheck.contains(s)){
-//					count += important.get(s);
-//				}
-//			}
-////			if(count > 2)
-////				System.out.println(count);
-//			if(!bestAnswers.containsKey(count))
-//				bestAnswers.put(count, new LinkedList<Answer>());
-//			bestAnswers.get(count).add(ans);
-//		}
-		
-		
-//		ArrayList<Answer> best = new ArrayList<Answer>();
-//		int ansLeft = Math.min(NUM_ANS, as.size());
-//		
-//		for(Double d : bestAnswers.keySet()){
-//			LinkedList<Answer> set = bestAnswers.get(d);
-//			if(set.size() < ansLeft){
-//				best.addAll(set);
-//				ansLeft -= set.size();
-//			}
-//			else{
-//				for(int x = 0; x < ansLeft; x++){
-//					best.add(set.get(x));
-//				}
-//				ansLeft = 0;
-//			}
-//			if(ansLeft == 0)
-//				break;
-//		}
-
-//		return best;
 	}
 
 	private HashMap<String, Double> getVector(Answer ans){

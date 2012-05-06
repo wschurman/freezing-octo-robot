@@ -3,7 +3,10 @@ import java.util.List;
 
 import edu.stanford.nlp.util.CoreMap;
 
-
+/*
+ * Class to hold a single instance of the document.
+ * Represented by a hash map of tag to inner value.
+ */
 public class Document {
 	
 	public HashMap<String, String> content;

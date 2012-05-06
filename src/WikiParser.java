@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -51,7 +50,6 @@ public class WikiParser {
 			String link = anchor.getAttributeByName("href");
 			String url = link.substring(link.lastIndexOf("/") + 1);
 			toRet.add(url);
-//			System.out.println(header.getText() + " " + res.getText());
 		}
 		return toRet;
 		
@@ -79,7 +77,6 @@ public class WikiParser {
 			TagNode res = results[i];
 			TagNode header = headers[i];
 			all += header.getText() + " " + res.getText();
-//			System.out.println(header.getText() + " " + res.getText());
 		}
 		System.out.println(all);
 		try {
@@ -150,7 +147,6 @@ public class WikiParser {
 				e.printStackTrace();
 			}
 		}
-//		System.out.println(relevantInfo);
 		return relevantInfo;
 	}
 	
@@ -337,12 +333,6 @@ public class WikiParser {
 				mappings.put(word, 0.0);
 			mappings.put(word, mappings.get(word) + 2);
 		}
-//		RankMap<Double, String> r = new RankMap<Double, String>(mappings, Collections.reverseOrder());
-//		List<String> ordered = r.getOrderedValues();
-//		for(String str : ordered){
-//			System.out.println(str + " - " + mappings.get(str));
-//		}
-		
 		return mappings;
 	}
 	
@@ -359,7 +349,6 @@ public class WikiParser {
 		for(String s : ordered){
 			System.out.println(s + " - " + map.get(s));
 		}
-//		WikiParser.searchAllSites(arr);
 	}
 
 }
